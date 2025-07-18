@@ -1,0 +1,72 @@
+<!--느낌표 하나만 쳐도 기본 틀이 뚝딱-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    
+</body>
+</html>
+
+<div></div>
+<div class="class"></div> <!--태그 입력+. - class 속성 추가-->
+<div id="id"></div> <!--태그 입력+# - id 속성 추가-->
+
+<!--부모자식화 -->
+<!--div>ul>li-->
+<div>
+    <ul>
+        <li></li>
+    </ul>
+</div>
+<!--한 번에 태그 두개 생성-->
+<!--div>ul+ol-->
+<div>
+    <ul></ul>
+    <ol></ol>
+</div>
+<!--반복생성-->
+<!--ul>li*5-->
+<ul>
+    <li></li>
+    <li></li>
+    <li></li>
+    <li></li>
+    <li></li>
+</ul>
+<!--상위태그 중간에 또 넣기-->
+<!--div>ul>li^ol-->
+<div>
+    <ul>
+        <li></li>
+    </ul>
+    <ol></ol>
+</div>
+<!--그룹화-->
+<!--div>(header>ul>li*2>a)+footer>p-->
+<div>
+    <header>
+        <ul>
+            <li><a href=""></a></li>
+            <li><a href=""></a></li>
+        </ul>
+    </header>
+    <footer>
+        <p></p>
+    </footer>
+</div>
+<!--태그 안에 텍스트 넣기-->
+<!--p{hello}-->
+<p>hello</p>
+<!--자동 번호 넣기-->
+<!--p.class${item $}*5-->
+<p class="class1">item 1</p>
+<p class="class2">item 2</p>
+<p class="class3">item 3</p>
+<p class="class4">item 4</p>
+<p class="class5">item 5</p>
+
+<!--lorem$: 더미 텍스트 생성($: 단어 수 지정 가능)-->
