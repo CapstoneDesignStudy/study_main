@@ -61,9 +61,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-    defaults:
-          run:
-            working-directory: contents/cicd.demo
 
     steps:
     - uses: actions/checkout@v4
@@ -72,8 +69,14 @@ jobs:
       with:
         java-version: '17'
         distribution: 'temurin'
+        
+    - name: Grant execute permission to gradlew (for dependency-submission)
+      run: chmod +x gradlew
+      working-directory: contents/cicd.demo
 
     # Generates and submits a dependency graph, enabling Dependabot Alerts for all project dependencies.
     # See: https://github.com/gradle/actions/blob/main/dependency-submission/README.md
     - name: Generate and submit dependency graph
       uses: gradle/actions/dependency-submission@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
+      with:
+        build-root-directory: contents/cicd.demo
