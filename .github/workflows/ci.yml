@@ -13,8 +13,12 @@ jobs:
       contents: read
 
     steps:
-    - uses: actions/checkout@v4
-      # 레포지토리의 모든 파일을 워크플로우가 실행될 환경으로 체크아웃합니다.
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        # 레포지토리를 $GITHUB_WORKSPACE (예: /home/runner/work/study_main) 바로 아래에 체크아웃합니다.
+        # 이렇게 하면 경로 중첩 문제 (study_main/study_main)를 방지할 수 있습니다.
+        path: ./ # <<<--- 이 부분 추가! 워크스페이스 루트에 체크아웃
 
     - name: Set up JDK 17
       uses: actions/setup-java@v4
@@ -23,21 +27,17 @@ jobs:
         distribution: 'temurin'
 
     # Gradle 설정을 최적화하고 종속성 캐싱을 활성화합니다.
-    # 이 스텝은 Gradle 프로젝트의 루트 경로를 'build-root-directory'로 지정해야 합니다.
+    # 이제 'content/cicd.demo'는 체크아웃된 레포지토리의 루트로부터의 상대 경로입니다.
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
       with:
-        # Gradle 프로젝트가 위치한 서브디렉토리를 지정합니다.
-        # 이 경로 내에서 Gradle Wrapper가 찾아지고, 캐싱 등이 설정됩니다.
-        # 주의: 'gradle/actions/setup-gradle' 액션은 'working-directory' 대신 'build-root-directory'를 사용합니다.
-        build-root-directory: content/cicd.demo # <<<--- 여기에 'build-root-directory' 사용!
+        build-root-directory: content/cicd.demo # <<<--- 경로 그대로 유지
 
     # Gradle Wrapper를 사용하여 프로젝트를 빌드합니다.
-    # 'working-directory'를 통해 'content/cicd.demo' 내부에서 명령이 실행됩니다.
-    # 따라서 './gradlew build'는 'content/cicd.demo/gradlew build'와 동일하게 작동합니다.
+    # 'working-directory'도 체크아웃된 레포지토리의 루트로부터의 상대 경로입니다.
     - name: Build with Gradle Wrapper
       run: ./gradlew build
-      working-directory: content/cicd.demo # <<<--- 이 부분은 'run' 스텝이므로 'working-directory'가 맞습니다.
+      working-directory: content/cicd.demo # <<<--- 경로 그대로 유지
 
     # --- 추가: 테스트 실행 스텝 (선택 사항, 권장) ---
     - name: Run tests with Gradle Wrapper
@@ -61,7 +61,11 @@ jobs:
       contents: write
 
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout code for dependency submission
+      uses: actions/checkout@v4
+      with:
+        # 종속성 제출 잡도 동일하게 체크아웃 경로를 명확히 지정합니다.
+        path: ./ # <<<--- 이 부분 추가!
 
     - name: Set up JDK 17
       uses: actions/setup-java@v4
@@ -69,11 +73,8 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
 
-    # 종속성 그래프를 생성하고 제출하여 Dependabot Alerts를 활성화합니다.
-    # 이 스텝도 Gradle 프로젝트의 루트 디렉토리에서 실행되어야 합니다.
+    # 종속성 그래프를 생성하고 제출합니다.
     - name: Generate and submit dependency graph
       uses: gradle/actions/dependency-submission@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
       with:
-        # 종속성 제출을 위한 Gradle 프로젝트가 위치한 서브디렉토리를 지정합니다.
-        # 주의: 'gradle/actions/dependency-submission' 액션도 'working-directory' 대신 'build-root-directory'를 사용합니다.
-        build-root-directory: content/cicd.demo # <<<--- 여기에 'build-root-directory' 사용!
+        build-root-directory: content/cicd.demo # <<<--- 경로 그대로 유지
