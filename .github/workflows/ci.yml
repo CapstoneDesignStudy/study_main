@@ -15,10 +15,7 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-      with:
-        # 레포지토리를 $GITHUB_WORKSPACE (예: /home/runner/work/study_main) 바로 아래에 체크아웃합니다.
-        # 이렇게 하면 경로 중첩 문제 (study_main/study_main)를 방지할 수 있습니다.
-        path: ./ # <<<--- 이 부분 추가! 워크스페이스 루트에 체크아웃
+      # path 옵션 제거. 기본적으로 레포지토리는 /home/runner/work/study_main/study_main 에 체크아웃됨
 
     - name: Set up JDK 17
       uses: actions/setup-java@v4
@@ -27,33 +24,34 @@ jobs:
         distribution: 'temurin'
 
     # Gradle 설정을 최적화하고 종속성 캐싱을 활성화합니다.
-    # 이제 'content/cicd.demo'는 체크아웃된 레포지토리의 루트로부터의 상대 경로입니다.
+    # 이제 빌드 루트 디렉토리는 체크아웃된 레포지토리 안의 실제 프로젝트 경로를 명시합니다.
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
       with:
-        build-root-directory: content/cicd.demo # <<<--- 경로 그대로 유지
+        build-root-directory: study_main/content/cicd.demo # <<<--- 경로를 'repo_name/sub_path' 형태로!
 
     # Gradle Wrapper를 사용하여 프로젝트를 빌드합니다.
-    # 'working-directory'도 체크아웃된 레포지토리의 루트로부터의 상대 경로입니다.
+    # working-directory도 마찬가지로 repo_name을 포함한 절대 경로로 지정된 것처럼 동작하도록
     - name: Build with Gradle Wrapper
       run: ./gradlew build
-      working-directory: content/cicd.demo # <<<--- 경로 그대로 유지
+      working-directory: study_main/content/cicd.demo # <<<--- 경로를 'repo_name/sub_path' 형태로!
 
     # --- 추가: 테스트 실행 스텝 (선택 사항, 권장) ---
     - name: Run tests with Gradle Wrapper
       run: ./gradlew test
-      working-directory: content/cicd.demo
+      working-directory: study_main/content/cicd.demo
 
     # --- 추가: JAR 파일 빌드 및 아티팩트 업로드 스텝 (선택 사항, 배포 시 필요) ---
     - name: Build executable JAR
       run: ./gradlew bootJar
-      working-directory: content/cicd.demo
+      working-directory: study_main/content/cicd.demo
 
     - name: Upload JAR artifact
       uses: actions/upload-artifact@v4
       with:
         name: backend-app-jar
-        path: content/cicd.demo/build/libs/*.jar
+        # JAR 파일의 최종 경로는 /home/runner/work/study_main/study_main/content/cicd.demo/build/libs/*.jar
+        path: study_main/content/cicd.demo/build/libs/*.jar
 
   dependency-submission:
     runs-on: ubuntu-latest
@@ -63,9 +61,7 @@ jobs:
     steps:
     - name: Checkout code for dependency submission
       uses: actions/checkout@v4
-      with:
-        # 종속성 제출 잡도 동일하게 체크아웃 경로를 명확히 지정합니다.
-        path: ./ # <<<--- 이 부분 추가!
+      # path 옵션 제거
 
     - name: Set up JDK 17
       uses: actions/setup-java@v4
@@ -77,4 +73,4 @@ jobs:
     - name: Generate and submit dependency graph
       uses: gradle/actions/dependency-submission@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
       with:
-        build-root-directory: content/cicd.demo # <<<--- 경로 그대로 유지
+        build-root-directory: study_main/content/cicd.demo # <<<--- 경로를 'repo_name/sub_path' 형태로!
