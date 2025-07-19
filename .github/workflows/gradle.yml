@@ -21,7 +21,7 @@ jobs:
       contents: read
     defaults:
           run:
-            working-directory: contents/cicd.demo
+            working-directory: ./contents/cicd.demo
 
 
     
@@ -60,7 +60,7 @@ jobs:
       contents: write
     defaults:
           run:
-            working-directory: contents/cicd.demo
+            working-directory: ./contents/cicd.demo
 
     steps:
     - uses: actions/checkout@v4
