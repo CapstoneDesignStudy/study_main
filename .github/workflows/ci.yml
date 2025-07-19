@@ -21,43 +21,39 @@ jobs:
       with:
         java-version: '17'
         distribution: 'temurin'
-      # Java Development Kit (JDK) 17을 설정합니다.
-      # Gradle 프로젝트 빌드에 필요한 Java 환경을 제공합니다.
 
     # Gradle 설정을 최적화하고 종속성 캐싱을 활성화합니다.
-    # 이 스텝은 Gradle Wrapper 파일이 있는 디렉토리에서 실행되어야 합니다.
+    # 이 스텝은 Gradle 프로젝트의 루트 경로를 'build-root-directory'로 지정해야 합니다.
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
       with:
         # Gradle 프로젝트가 위치한 서브디렉토리를 지정합니다.
         # 이 경로 내에서 Gradle Wrapper가 찾아지고, 캐싱 등이 설정됩니다.
-        working-directory: content/cicd.demo
+        # 주의: 'gradle/actions/setup-gradle' 액션은 'working-directory' 대신 'build-root-directory'를 사용합니다.
+        build-root-directory: content/cicd.demo # <<<--- 여기에 'build-root-directory' 사용!
 
     # Gradle Wrapper를 사용하여 프로젝트를 빌드합니다.
     # 'working-directory'를 통해 'content/cicd.demo' 내부에서 명령이 실행됩니다.
     # 따라서 './gradlew build'는 'content/cicd.demo/gradlew build'와 동일하게 작동합니다.
     - name: Build with Gradle Wrapper
       run: ./gradlew build
-      working-directory: content/cicd.demo # <<<--- 이 부분이 핵심!
+      working-directory: content/cicd.demo # <<<--- 이 부분은 'run' 스텝이므로 'working-directory'가 맞습니다.
 
     # --- 추가: 테스트 실행 스텝 (선택 사항, 권장) ---
     - name: Run tests with Gradle Wrapper
       run: ./gradlew test
-      working-directory: content/cicd.demo # <<<--- 이 부분도 핵심!
-      # 테스트를 실행하는 스텝입니다. 빌드와 마찬가지로 올바른 working-directory가 필요합니다.
+      working-directory: content/cicd.demo
 
     # --- 추가: JAR 파일 빌드 및 아티팩트 업로드 스텝 (선택 사항, 배포 시 필요) ---
-    # Spring Boot 애플리케이션의 경우 실행 가능한 JAR 파일을 생성합니다.
     - name: Build executable JAR
       run: ./gradlew bootJar
       working-directory: content/cicd.demo
 
-    # 빌드된 JAR 파일을 GitHub Actions 아티팩트로 업로드하여 워크플로우 실행 후 다운로드할 수 있게 합니다.
     - name: Upload JAR artifact
       uses: actions/upload-artifact@v4
       with:
-        name: backend-app-jar # 아티팩트의 이름
-        path: content/cicd.demo/build/libs/*.jar # JAR 파일이 생성되는 경로 (프로젝트 설정에 따라 다를 수 있음)
+        name: backend-app-jar
+        path: content/cicd.demo/build/libs/*.jar
 
   dependency-submission:
     runs-on: ubuntu-latest
@@ -79,4 +75,5 @@ jobs:
       uses: gradle/actions/dependency-submission@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
       with:
         # 종속성 제출을 위한 Gradle 프로젝트가 위치한 서브디렉토리를 지정합니다.
-        working-directory: content/cicd.demo # <<<--- 이 부분도 핵심!
+        # 주의: 'gradle/actions/dependency-submission' 액션도 'working-directory' 대신 'build-root-directory'를 사용합니다.
+        build-root-directory: content/cicd.demo # <<<--- 여기에 'build-root-directory' 사용!
