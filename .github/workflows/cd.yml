@@ -2,20 +2,22 @@ name: Docker CD
 
 # main 브랜치로 push될 때만 실행. (pull request에서는 실행되지 않도록)
 on:
-  push:
-    branches: ["main"]
+  workflow_run:
+    workflows: ["Java CI with Gradle"] # ci.yml 파일의 'name'을 정확히 명시
+    types:
+      - completed # 'Java CI with Gradle' 워크플로우가 완료될 때 트리거
+    branches:
+      - main # main 브랜치에서 완료되었을 때만 실행
 
 jobs:
   docker-build:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+
     runs-on: ubuntu-latest
     permissions:
       contents: write
       packages: write # Docker Hub 푸시를 위한 권한
-
-    # 이 Job은 'build' Job이 성공적으로 완료되어야만 실행.
-    # 'build' Job은 ci.yml에 정의되어 있으므로, 이 두 워크플로우가 서로 종속성을 가짐.
-
-    needs: build
+      pull-requests: write
 
     steps:
       - name: Checkout repository
