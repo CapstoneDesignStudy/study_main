@@ -1,0 +1,64 @@
+name: Java CI with Gradle
+
+# main 브랜치로 push되거나 pull request가 발생할 때 실행
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: "17"
+          distribution: "temurin"
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+        working-directory: contents/cicd.demo
+
+      - name: Build with Gradle Wrapper
+        run: ./gradlew build
+        working-directory: contents/cicd.demo
+
+      # 빌드된 JAR 파일을 다음 Job에서 사용할 수 있도록 아티팩트로 저장합니다.
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: my-spring-app-artifact
+          path: contents/cicd.demo/build/libs/ # 빌드된 JAR 파일이 위치한 경로를 명시해야 합니다.
+          # 일반적으로 `build/libs`에 `my-spring-app.jar` 같은 이름으로 생성됩니다.
+
+  dependency-submission:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write # pull_request에 대한 의존성 그래프 제출 시 필요
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: "17"
+          distribution: "temurin"
+
+      - name: Grant execute permission to gradlew
+        run: chmod +x gradlew
+        working-directory: contents/cicd.demo
+
+      - name: Generate and submit dependency graph
+        uses: gradle/actions/dependency-submission@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
+        with:
+          build-root-directory: contents/cicd.demo
