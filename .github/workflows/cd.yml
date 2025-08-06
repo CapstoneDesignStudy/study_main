@@ -29,6 +29,7 @@ jobs:
         with:
           name: my-spring-app-artifact
           path: contents/cicd.demo/build/libs/ # 다운로드할 경로를 지정.
+          run-id: ${{ github.event.workflow_run.id }}
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
