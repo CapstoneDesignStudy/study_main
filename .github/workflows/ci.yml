@@ -30,13 +30,11 @@ jobs:
         run: ./gradlew build
         working-directory: contents/cicd.demo
 
-      # 빌드된 JAR 파일을 다음 Job에서 사용할 수 있도록 아티팩트로 저장합니다.
+      # 빌드된 JAR 파일을 다음 Job에서 사용할 수 있도록 아티팩트로 저장
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: my-spring-app-artifact
-          path: contents/cicd.demo/build/libs/ # 빌드된 JAR 파일이 위치한 경로를 명시해야 합니다.
-          # 일반적으로 `build/libs`에 `my-spring-app.jar` 같은 이름으로 생성됩니다.
+          path: contents/cicd.demo/build/libs/ # 빌드된 JAR 파일이 위치한 경로를 명시
 
   dependency-submission:
     runs-on: ubuntu-latest
