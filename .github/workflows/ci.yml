@@ -34,7 +34,6 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: my-artifact # 추가
           path: contents/cicd.demo/build/libs/ # 빌드된 JAR 파일이 위치한 경로를 명시
 
   dependency-submission:
